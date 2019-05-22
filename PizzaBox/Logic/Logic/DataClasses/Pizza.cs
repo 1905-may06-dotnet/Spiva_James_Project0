@@ -56,23 +56,14 @@ namespace Logic.PizzaBox.DataClasses
             Price = CalcCost();
         }
 
-        public Data.PizzaBox.DataModel.Pizza ToPizzaData()
+        public void Make (int orderID)
         {
-            //order ID is not yet set at this point and has to be set when the order is added to db
-            //handled int ExternalDB.AddOrder
-            Data.PizzaBox.DataModel.Pizza pizza = new Data.PizzaBox.DataModel.Pizza() { SizeId = Size.ID, Price = Price, Amount = Amount, CrustId = Crust.ID, PresetId = Preset.ID };
-            return pizza;
-        }
-        public List<Data.PizzaBox.DataModel.PizzaTopping1> ToToppingData()
-        {
-            //pizza ID is not yet set at this point and has to be set when the order is added to db
-            //handled int ExternalDB.AddOrder
-            List<Data.PizzaBox.DataModel.PizzaTopping1> toppings = new List<Data.PizzaBox.DataModel.PizzaTopping1>();
-            foreach (var t in Toppings)
+            Data.PizzaBox.DataModel.Pizza pizza = new Data.PizzaBox.DataModel.Pizza() { OrderId = orderID, SizeId = Size.ID, CrustId = Crust.ID, PresetId = Preset.ID, Amount = Amount, Price = Price };
+            ExternalDB.Add(pizza);
+            foreach(var t in Toppings)
             {
-                toppings.Add(new Data.PizzaBox.DataModel.PizzaTopping1() { ToppingId = t.ID });
+                Data.PizzaBox.DataModel.PizzaTopping1 topping = new Data.PizzaBox.DataModel.PizzaTopping1() { PizzaId = pizza.Id, ToppingId = t.ID };
             }
-            return toppings;
         }
 
         public double CalcCost()

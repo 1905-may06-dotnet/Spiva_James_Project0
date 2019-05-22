@@ -9,16 +9,17 @@ namespace Logic.PizzaBox.DataClasses
     public class Restaurant
     {
         public int ID { get; set; }
-        public (int ID, string Name) Store { get; set; }
+        public (int ID, string Name, int? MaxPrice, int? MaxPizza, int? MaxToppings, int MinHours) Store { get; set; }
         public (int Open, int Close) Hours { get; set; }
 
         public Address address;
 
+        public Restaurant(int RestaurantID) : this(ExternalDB.Find<Data.PizzaBox.DataModel.Location>(RestaurantID)) { }
         public Restaurant(Data.PizzaBox.DataModel.Location restaurant)
         {
             var s = ExternalDB.Find<Data.PizzaBox.DataModel.Store>(restaurant.StoreId);
             ID = restaurant.Id;
-            Store = (s.Id, s.Name);
+            Store = (s.Id, s.Name, s.MaxPrice, s.MaxPizza, s.MaxToppings, s.MinHours);
             Hours = (restaurant.OpenTime, restaurant.CloseTime);
             address = new Address(ExternalDB.Find<Data.PizzaBox.DataModel.Address>(restaurant.AddressId));
         }

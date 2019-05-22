@@ -115,28 +115,16 @@ namespace Logic.PizzaBox
 
             return null;
         }
-        private void CreateOrder(Order order)
-        {
-            Purchase purchase = order.ToPurchaseData();
-            List<Data.PizzaBox.DataModel.Pizza> pizzas = new List<Data.PizzaBox.DataModel.Pizza>();
-            List<List<PizzaTopping1>> toppings = new List<List<PizzaTopping1>>();
-            for (int i = 0; i < order.pizzas.Count; i++)
-            {
-                pizzas.Add(order.pizzas[i].ToPizzaData());
-                toppings.Add(order.pizzas[i].ToToppingData());
-            }
-            ExternalDB.AddOrder(purchase, pizzas, toppings);
-        }
+
         public string MakeOrder(string username, int restaurantID, List<Logic.PizzaBox.DataClasses.Pizza> pizzas)
         {
             Order order = new Order(username, restaurantID, pizzas);
-            Location restaurant = ExternalDB.Find<Location>(restaurantID);
-            Store store = ExternalDB.GetStore(restaurantID);
+            Restaurant restaurant = new Restaurant(restaurantID);
 
-            Purchase recentOrder = ExternalDB.GetOrders(order.User.ID).FirstOrDefault();
+            Purchase recentOrder = ExternalDB.GetOrders(order.User.ID).OrderByDescending(x => x.Date).FirstOrDefault();
             DateTime recentDate = DateTime.MinValue;
             if (recentOrder != null) recentDate = recentOrder.Date;
-            int minHours = ExternalDB.GetStore(order.Restaurant.ID).MinHours;
+            int minHours = restaurant.Store.MinHours;
             var offset = order.Date.Subtract(recentDate);
 
             if (recentDate.Date.Equals(order.Date.Date) && recentOrder.LocationId != order.Restaurant.ID)
@@ -147,15 +135,15 @@ namespace Logic.PizzaBox
             {
                 return "Unable to create order. You already ordered recently.";
             }
-            else if (order.Date.Hour < restaurant.OpenTime || order.Date.Hour >= restaurant.CloseTime)
+            else if (order.Date.Hour < restaurant.Hours.Open || order.Date.Hour >= restaurant.Hours.Close)
             {
                 return "Unable to create order. You can only order while the store is open.";
             }
-            else if (store.MaxPizza != null && order.PizzaCount > store.MaxPizza)
+            else if (restaurant.Store.MaxPizza != null && order.PizzaCount > restaurant.Store.MaxPizza)
             {
                 return "Unable to create order. You cannot order that many pizzas.";
             }
-            else if (store.MaxPrice != null && order.Price > store.MaxPrice)
+            else if (restaurant.Store.MaxPrice != null && order.Price > restaurant.Store.MaxPrice)
             {
                 return "Unable to create order. Order exceeds maximum allowed price.";
             }
@@ -165,7 +153,7 @@ namespace Logic.PizzaBox
             }
             else
             {
-                CreateOrder(order);
+                order.Make();
                 return "Pizzas have been ordered!";
             }
         }

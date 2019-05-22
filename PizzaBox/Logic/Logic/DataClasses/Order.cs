@@ -63,8 +63,16 @@ namespace Logic.PizzaBox.DataClasses
             Data.PizzaBox.DataModel.Purchase purchase = new Data.PizzaBox.DataModel.Purchase() { UserId = User.ID, LocationId = Restaurant.ID, Date = Date };
             return purchase;
         }
+        public void Make ()
+        {
+            Data.PizzaBox.DataModel.Purchase purchase = new Data.PizzaBox.DataModel.Purchase() { UserId = User.ID, LocationId = Restaurant.ID, Date = Date };
+            ExternalDB.Add(purchase);
+            foreach (var p in pizzas) {
+                p.Make(purchase.Id);
+            }
+        }
 
-        public string AsString(bool showUser, bool showRestaurant, bool detailed) //TODO : Price
+        public string AsString(bool showUser, bool showRestaurant, bool detailed) 
         {
             string s = $"({ID}) {Price}$ - {Date}: ";
 

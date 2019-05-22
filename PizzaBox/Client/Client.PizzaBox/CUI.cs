@@ -12,6 +12,7 @@ namespace Client.PizzaBox
         SystemLogic systemLogic;
         string username;
         int restaurantID;
+        (int ID, string Name, int? MaxPrice, int? MaxPizza, int? MaxToppings, int MinHours) storeInfo;
 
         public CUI(SystemLogic systemLogic)
         {
@@ -94,14 +95,13 @@ namespace Client.PizzaBox
         {
 
             if (!ChooseLocation()) return;
-
-            var store = GetStore();
+            storeInfo = new Restaurant(restaurantID).Store;
             List<Pizza> pizzas = new List<Pizza>();
 
             while (true)
             {
-                if (store.MaxPizza != null) Console.WriteLine($"Cannot order more than {store.MaxPizza} pizzas");
-                if (store.MaxPrice != null) Console.WriteLine($"Order cannot exceed {store.MaxPrice}$");
+                if (storeInfo.MaxPizza != null) Console.WriteLine($"Cannot order more than {storeInfo.MaxPizza} pizzas");
+                if (storeInfo.MaxPrice != null) Console.WriteLine($"Order cannot exceed {storeInfo.MaxPrice}$");
 
                 List<string> commands = new List<string>() { "new", "change amount", "remove", "view", "done" };
                 int command = OptionsInput("Order Menu (-1 to cancel): ", commands, true);
@@ -155,7 +155,6 @@ namespace Client.PizzaBox
 
         public void NewPizza(List<Pizza> pizzas)
         {
-            var store = GetStore();
             var cList = GetPartList<Data.PizzaBox.DataModel.PizzaCrust>();
             var sList = GetPartList<Data.PizzaBox.DataModel.PizzaSize>();
             var pList = GetPartList<Data.PizzaBox.DataModel.PizzaPreset>();
@@ -176,7 +175,7 @@ namespace Client.PizzaBox
             }
             if (useCustom == 1) //intentional to cancel presets
             {
-                int? maxToppings = store.MaxToppings;
+                int? maxToppings = storeInfo.MaxToppings;
                 Console.WriteLine($"Enter '-1' to stop adding toppings ");
                 if (maxToppings != null) Console.Write($"({maxToppings} max)");
                 Console.WriteLine();
@@ -319,14 +318,10 @@ namespace Client.PizzaBox
         #endregion
 
         #region DB Access
-        public Data.PizzaBox.DataModel.Store GetStore ()
-        {
-            return ExternalDB.GetStore(restaurantID);
-        }
         public List<(int id, string name)> GetPartList<T> () where T : Data.PizzaBox.DataModel.PizzaPart
         {
             List<(int id, string name)> list = new List<(int id, string name)>();
-            foreach (var p in ExternalDB.FindPizzaPartsList<T>(ExternalDB.GetStore(restaurantID).Id))
+            foreach (var p in ExternalDB.FindPizzaPartsList<T>(storeInfo.ID))
             {
                 list.Add((p.Id, p.Name));
             }
