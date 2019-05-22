@@ -183,8 +183,9 @@ namespace Client.PizzaBox
 
                 for (int i = 0; maxToppings == null || i < maxToppings; i++)
                 {
-                    int t = tList[OptionsInput("Toppings (-1 to stop): ", tList.Select(x => x.name).ToList(), true)].id;
+                    int t = OptionsInput("Toppings (-1 to stop): ", tList.Select(x => x.name).ToList(), true);
                     if (t == -1) break;
+                    t = tList[t].id;
                     toppings.Add(t);
                 }
             }

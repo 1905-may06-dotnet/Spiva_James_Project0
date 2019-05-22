@@ -9,6 +9,7 @@
     <ProjectReference Include="..\Client\Client.PizzaBox\Client.PizzaBox.csproj" />
     <ProjectReference Include="..\Data\Data\Data.PizzaBox.csproj" />
     <ProjectReference Include="..\Logic\Logic\Logic.PizzaBox.csproj" />
+    <ProjectReference Include="..\Test\Testing.PizzaBox\Testing.PizzaBox.csproj" />
   </ItemGroup>
 
 </Project>

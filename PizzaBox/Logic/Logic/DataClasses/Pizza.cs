@@ -86,7 +86,7 @@ namespace Logic.PizzaBox.DataClasses
 
             if (Preset.ID != null) s += $"{Preset.Name} = ";
 
-            s += "toppings: ";
+            s += "toppings:";
             bool none = true;
             foreach (var t in Toppings)
             {

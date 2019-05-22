@@ -132,11 +132,13 @@ namespace Logic.PizzaBox
             Order order = new Order(username, restaurantID, pizzas);
             Store store = ExternalDB.GetStore(restaurantID);
 
-            Purchase recent = ExternalDB.GetOrders(order.User.ID).FirstOrDefault();
+            Purchase recentOrder = ExternalDB.GetOrders(order.User.ID).FirstOrDefault();
+            DateTime recentDate = DateTime.MinValue;
+            if (recentOrder != null) recentDate = recentOrder.Date;
             int minHours = ExternalDB.GetStore(order.Restaurant.ID).MinHours;
-            var offset = order.Date.Subtract(recent.Date);
+            var offset = order.Date.Subtract(recentDate);
 
-            if (recent.Date.Date.Equals(order.Date.Date) && recent.LocationId != order.Restaurant.ID)
+            if (recentDate.Date.Equals(order.Date.Date) && recentOrder.LocationId != order.Restaurant.ID)
             {
                 return "Unable to create order. You already ordered from a different location today.";
             }
