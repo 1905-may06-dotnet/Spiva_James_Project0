@@ -130,6 +130,7 @@ namespace Logic.PizzaBox
         public string MakeOrder(string username, int restaurantID, List<Logic.PizzaBox.DataClasses.Pizza> pizzas)
         {
             Order order = new Order(username, restaurantID, pizzas);
+            Location restaurant = ExternalDB.Find<Location>(restaurantID);
             Store store = ExternalDB.GetStore(restaurantID);
 
             Purchase recentOrder = ExternalDB.GetOrders(order.User.ID).FirstOrDefault();
@@ -145,6 +146,10 @@ namespace Logic.PizzaBox
             else if (offset.Hours < minHours)
             {
                 return "Unable to create order. You already ordered recently.";
+            }
+            else if (order.Date.Hour < restaurant.OpenTime || order.Date.Hour >= restaurant.CloseTime)
+            {
+                return "Unable to create order. You can only order while the store is open.";
             }
             else if (store.MaxPizza != null && order.PizzaCount > store.MaxPizza)
             {
